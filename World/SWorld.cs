@@ -54,7 +54,7 @@ namespace SimpleECS
                 Update();
             }
         }
-        private void Update()
+        protected virtual void Update()
         {
             lock (Systems)
             {
