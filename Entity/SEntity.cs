@@ -16,10 +16,19 @@ namespace SimpleECS
     {
         public uint UID;
 
+        public Action<SEntity> OnAddToWorld { get; set; }
+        public Action<SEntity> OnRemoveFromWorld { get; set; }
+
+
         protected override void InitCom(ISComponent c)
         {
             c.SetEntity(this);
             base.InitCom(c);
+        }
+        protected override void OnRemove(ISComponent Com)
+        {
+            Com.OnRemoveFromEntity?.Invoke(Com);
+            base.OnRemove(Com);
         }
     }
 }

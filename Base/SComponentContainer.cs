@@ -26,7 +26,6 @@ namespace SimpleECS
                     foreach (var c in l)
                     {
                         AddComponent(c);
-                        InitCom(c);
                     }
                 }
             }
@@ -146,11 +145,13 @@ namespace SimpleECS
                         }
                         Components.Remove(com);
                         OnRemoveCom?.Invoke(com);
+                        OnRemove(com);
                     }
                 }
             }
         }
-
+        protected virtual void OnRemove(T Com) { 
+        }
         public void RemoveComponent<Com>() where Com : T
         {
             RemoveComponent(typeof(Com));
@@ -158,6 +159,10 @@ namespace SimpleECS
 
         public void RemoveComponent(Type type)
         {
+            var c = GetComponent(type);
+            if (c==null) {
+                return;
+            }
             RemoveComponent(GetComponent(type).UID);
         }
     }

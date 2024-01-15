@@ -146,6 +146,7 @@ namespace SimpleECS
                     };
                     Entity.Init();
                     IDEntities.Add(Entity.UID, Entity);
+                    Entity.OnAddToWorld?.Invoke(Entity);
                 }
             }
         }
@@ -162,6 +163,7 @@ namespace SimpleECS
                     if (IDEntities.ContainsKey(UID))
                     {
                         var Entity = IDEntities[UID];
+                        Entity.OnRemoveFromWorld?.Invoke(Entity);
                         IDEntities.Remove(UID);
                         foreach (var c in Entity.Components)
                         {

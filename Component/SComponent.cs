@@ -1,10 +1,13 @@
-﻿namespace SimpleECS
+﻿using System;
+
+namespace SimpleECS
 {
     public abstract class SComponent : ISComponent
     {
         public ushort uid;
         public ushort UID => uid;
         public SEntity Entity { get; private set; }
+        public Action<ISComponent> OnRemoveFromEntity { get; set; }
 
         public SEntity GetEntity()
         {
