@@ -37,9 +37,9 @@ namespace SimpleECS
         {
         }
 
-        public T AddComponent<Com>() where Com : T
+        public Com AddComponent<Com>() where Com : T
         {
-            return AddComponent(typeof(Com));
+            return (Com)AddComponent(typeof(Com));
         }
 
         public T AddComponent(T Component)
@@ -96,9 +96,9 @@ namespace SimpleECS
             }
         }
 
-        public T GetComponent<Com>() where Com : T
+        public Com GetComponent<Com>() where Com : T
         {
-            return GetComponent(typeof(Com));
+            return (Com)GetComponent(typeof(Com));
         }
 
         public T GetComponent(Type type)

@@ -78,7 +78,8 @@ namespace SimpleECS
                             var t = s.GetAimComponet();
                             if (TDic.ContainsKey(t))
                             {
-                                foreach (var e in TDic[t])
+                                var l = TDic[t].ToArray();
+                                foreach (var e in l)
                                 {
                                     s.Update(e.GetComponent(t));
                                 }
@@ -165,7 +166,8 @@ namespace SimpleECS
                         var Entity = IDEntities[UID];
                         Entity.OnRemoveFromWorld?.Invoke(Entity);
                         IDEntities.Remove(UID);
-                        foreach (var c in Entity.Components)
+                        var l = Entity.Components.ToArray();
+                        foreach (var c in l)
                         {
                             if (TDic.ContainsKey(c.GetType()))
                             {
