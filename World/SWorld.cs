@@ -78,10 +78,13 @@ namespace SimpleECS
                             var t = s.GetAimComponet();
                             if (TDic.ContainsKey(t))
                             {
-                                var l = TDic[t].ToArray();
-                                foreach (var e in l)
-                                {
-                                    s.Update(e.GetComponent(t));
+                                lock (TDic[t]) {
+                                    for (int j = 0; j < TDic[t].Count; j++) {
+                                        if (j < TDic[t].Count) {
+                                            var e = TDic[t][j];
+                                            s.Update(e.GetComponent(t));
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -166,15 +169,18 @@ namespace SimpleECS
                         var Entity = IDEntities[UID];
                         Entity.OnRemoveFromWorld?.Invoke(Entity);
                         IDEntities.Remove(UID);
-                        var l = Entity.Components.ToArray();
-                        foreach (var c in l)
-                        {
-                            if (TDic.ContainsKey(c.GetType()))
+                        lock (Entity.Components) {
+                            foreach (var c in Entity.Components)
                             {
-                                TDic[c.GetType()].Remove(Entity);
-                                if (TDic[c.GetType()].Count == 0)
+                                if (TDic.ContainsKey(c.GetType()))
                                 {
-                                    TDic.Remove(c.GetType());
+                                    lock (TDic[c.GetType()]) {
+                                        TDic[c.GetType()].Remove(Entity);
+                                        if (TDic[c.GetType()].Count == 0)
+                                        {
+                                            TDic.Remove(c.GetType());
+                                        }
+                                    }
                                 }
                             }
                         }
