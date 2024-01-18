@@ -33,10 +33,12 @@ namespace SimpleECS.System
         {
             return typeof(Behaviour);
         }
-
         public void Update(ISComponent Component)
         {
             (Component as Behaviour).Update();
+        }
+        public void FixedUpdate(ISComponent Component) {
+            (Component as Behaviour).FixedUpdate();
         }
     }
 }

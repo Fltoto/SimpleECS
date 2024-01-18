@@ -12,6 +12,7 @@
         }
         public void Start() { Ctrl.SetEntity(GetEntity()); Ctrl.Start(); }
         public void Update() { Ctrl.Update(); }
+        public void FixedUpdate() { Ctrl.FixedUpdate(); }
         public void OnDestroy() { Ctrl.OnDestroy(); }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 /*
 # THIS FILE IS PART OF SimpleECS
 # 
@@ -16,11 +15,17 @@ namespace SimpleECS
 {
     public class SWorld : SComponentContainer<ISGlobalComponent>
     {
+        /// <summary>
+        /// System执行FixedUpdate的间隔
+        /// </summary>
+        public static float FixedTime = 0.03f;
+
         public bool Running { get; private set; }
         public Action<SEntity> OnAddEntity, OnRemoveEntity;
         public int FPS { get; private set; }
         private int fps;
         private DateTime LastFPS;
+        private DateTime LastFixed;
         private Thread main;
 
         private Dictionary<Type, List<ISComponent>> TDic = new Dictionary<Type, List<ISComponent>>();
@@ -28,6 +33,9 @@ namespace SimpleECS
         private List<ISSystem> Systems = new List<ISSystem>();
         private List<ISGlobalSystem> GlobalSystems = new List<ISGlobalSystem>();
 
+        /// <summary>
+        /// 如果不启用async你需要在每一帧自己调用Update
+        /// </summary>
         public void Start(bool async = true)
         {
             if (Running)
@@ -68,6 +76,13 @@ namespace SimpleECS
                 fps = 0;
                 LastFPS = DateTime.Now;
             }
+            if ((DateTime.Now - LastFixed).TotalSeconds>=FixedTime) {
+                LastFixed = DateTime.Now;
+                FixedUpdateSystem();
+            }
+            UpdateSystem();
+        }
+        private void UpdateSystem() {
             lock (Systems)
             {
                 lock (GlobalSystems)
@@ -90,10 +105,53 @@ namespace SimpleECS
                             var t = s.GetAimComponet();
                             if (TDic.ContainsKey(t))
                             {
-                                lock (TDic[t]) {
-                                    for (int j = 0; j < TDic[t].Count; j++) {
-                                        if (j < TDic[t].Count) {
+                                lock (TDic[t])
+                                {
+                                    for (int j = 0; j < TDic[t].Count; j++)
+                                    {
+                                        if (j < TDic[t].Count)
+                                        {
                                             s.Update(TDic[t][j]);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        private void FixedUpdateSystem()
+        {
+            lock (Systems)
+            {
+                lock (GlobalSystems)
+                {
+                    lock (TDic)
+                    {
+                        for (int i = 0; i < GlobalSystems.Count; i++)
+                        {
+                            var s = GlobalSystems[i];
+                            var t = s.GetAimComponet();
+                            var c = GetComponent(t);
+                            if (c != null)
+                            {
+                                s.Update(c);
+                            }
+                        }
+                        for (int i = 0; i < Systems.Count; i++)
+                        {
+                            var s = Systems[i];
+                            var t = s.GetAimComponet();
+                            if (TDic.ContainsKey(t))
+                            {
+                                lock (TDic[t])
+                                {
+                                    for (int j = 0; j < TDic[t].Count; j++)
+                                    {
+                                        if (j < TDic[t].Count)
+                                        {
+                                            s.FixedUpdate(TDic[t][j]);
                                         }
                                     }
                                 }
