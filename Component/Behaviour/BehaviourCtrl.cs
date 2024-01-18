@@ -1,4 +1,5 @@
-﻿namespace SimpleECS.Component {
+﻿namespace SimpleECS.Component
+{
     public abstract class BehaviourCtrl : IBehaviourCtrl
     {
         private SEntity Entity;
@@ -9,7 +10,7 @@
 
         public virtual void OnDestroy()
         {
-            
+
         }
 
         public void SetEntity(SEntity entity)
@@ -25,7 +26,8 @@
         {
         }
 
-        public virtual void FixedUpdate() { 
+        public virtual void FixedUpdate()
+        {
         }
     }
 }

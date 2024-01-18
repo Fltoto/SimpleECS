@@ -100,7 +100,8 @@ namespace SimpleECS
         {
             return (Com)GetComponent(typeof(Com));
         }
-        public T[] GetComponents<C>() where C : ISComponent {
+        public T[] GetComponents<C>() where C : ISComponent
+        {
             return GetComponents(typeof(C));
         }
         public T[] GetComponents(Type type)
@@ -160,7 +161,8 @@ namespace SimpleECS
                 }
             }
         }
-        protected virtual void OnRemove(T Com) { 
+        protected virtual void OnRemove(T Com)
+        {
         }
         public void RemoveComponent<Com>() where Com : T
         {
@@ -170,7 +172,8 @@ namespace SimpleECS
         public void RemoveComponent(Type type)
         {
             var c = GetComponent(type);
-            if (c==null) {
+            if (c == null)
+            {
                 return;
             }
             RemoveComponent(GetComponent(type).UID);

@@ -5,20 +5,25 @@ namespace SimpleECS.System
 {
     public class BehaviourSys : ISSystem
     {
-        public BehaviourSys(SWorld world) {
+        public BehaviourSys(SWorld world)
+        {
             world.OnAddEntity += OnEnter;
             world.OnRemoveEntity += OnExit;
         }
-        private void OnEnter(SEntity entity) {
+        private void OnEnter(SEntity entity)
+        {
             var be = entity.GetComponents<Behaviour>();
-            if (be==null) {
+            if (be == null)
+            {
                 return;
             }
-            foreach (var b in be) {
+            foreach (var b in be)
+            {
                 (b as Behaviour).Start();
             }
         }
-        private void OnExit(SEntity entity) {
+        private void OnExit(SEntity entity)
+        {
             var be = entity.GetComponents<Behaviour>();
             if (be == null)
             {
@@ -37,7 +42,8 @@ namespace SimpleECS.System
         {
             (Component as Behaviour).Update();
         }
-        public void FixedUpdate(ISComponent Component) {
+        public void FixedUpdate(ISComponent Component)
+        {
             (Component as Behaviour).FixedUpdate();
         }
     }

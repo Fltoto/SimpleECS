@@ -43,7 +43,8 @@ namespace SimpleECS
                 return;
             }
             Running = true;
-            if (async) {
+            if (async)
+            {
                 main = new Thread(() =>
                 {
                     Loop();
@@ -76,13 +77,15 @@ namespace SimpleECS
                 fps = 0;
                 LastFPS = DateTime.Now;
             }
-            if ((DateTime.Now - LastFixed).TotalSeconds>=FixedTime) {
+            if ((DateTime.Now - LastFixed).TotalSeconds >= FixedTime)
+            {
                 LastFixed = DateTime.Now;
                 FixedUpdateSystem();
             }
             UpdateSystem();
         }
-        private void UpdateSystem() {
+        private void UpdateSystem()
+        {
             lock (Systems)
             {
                 lock (GlobalSystems)
@@ -223,12 +226,14 @@ namespace SimpleECS
                         var Entity = IDEntities[UID];
                         Entity.OnRemoveFromWorld?.Invoke(Entity);
                         IDEntities.Remove(UID);
-                        lock (Entity.Components) {
+                        lock (Entity.Components)
+                        {
                             foreach (var c in Entity.Components)
                             {
                                 if (TDic.ContainsKey(c.GetType()))
                                 {
-                                    lock (TDic[c.GetType()]) {
+                                    lock (TDic[c.GetType()])
+                                    {
                                         TDic[c.GetType()].Remove(c);
                                         if (TDic[c.GetType()].Count == 0)
                                         {
