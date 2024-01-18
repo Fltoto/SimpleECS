@@ -100,7 +100,17 @@ namespace SimpleECS
         {
             return (Com)GetComponent(typeof(Com));
         }
-
+        public T[] GetComponents<C>() where C : ISComponent {
+            return GetComponents(typeof(C));
+        }
+        public T[] GetComponents(Type type)
+        {
+            if (Coms.ContainsKey(type))
+            {
+                return Coms[type].ToArray();
+            }
+            return null;
+        }
         public T GetComponent(Type type)
         {
             lock (Coms)

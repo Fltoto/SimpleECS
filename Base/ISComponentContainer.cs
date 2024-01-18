@@ -21,6 +21,8 @@ namespace SimpleECS
         public void RemoveComponent<Com>() where Com : T;
         public void RemoveComponent(Type type);
         public T GetComponent(ushort UID);
+        public T[] GetComponents<C>() where C : ISComponent;
+        public T[] GetComponents(Type type);
         public Com GetComponent<Com>() where Com : T;
         public T GetComponent(Type type);
         public bool HasComponent(ushort UID);

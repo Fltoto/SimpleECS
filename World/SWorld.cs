@@ -17,26 +17,32 @@ namespace SimpleECS
     public class SWorld : SComponentContainer<ISGlobalComponent>
     {
         public bool Running { get; private set; }
+        public Action<SEntity> OnAddEntity, OnRemoveEntity;
+        public int FPS { get; private set; }
+        private int fps;
+        private DateTime LastFPS;
         private Thread main;
 
-        private Dictionary<Type, List<SEntity>> TDic = new Dictionary<Type, List<SEntity>>();
+        private Dictionary<Type, List<ISComponent>> TDic = new Dictionary<Type, List<ISComponent>>();
         private Dictionary<uint, SEntity> IDEntities = new Dictionary<uint, SEntity>();
         private List<ISSystem> Systems = new List<ISSystem>();
         private List<ISGlobalSystem> GlobalSystems = new List<ISGlobalSystem>();
 
-        public void Start()
+        public void Start(bool async = true)
         {
             if (Running)
             {
                 return;
             }
             Running = true;
-            main = new Thread(() =>
-            {
-                Loop();
-            });
+            if (async) {
+                main = new Thread(() =>
+                {
+                    Loop();
+                });
+            }
             Init();
-            main.Start();
+            main?.Start();
         }
         public void Shutdown()
         {
@@ -46,16 +52,22 @@ namespace SimpleECS
             }
             Running = false;
         }
-        private async void Loop()
+        private void Loop()
         {
             while (Running)
             {
-                await Task.Delay(1);
                 Update();
             }
         }
-        protected virtual void Update()
+        public virtual void Update()
         {
+            fps++;
+            if ((DateTime.Now - LastFPS).TotalSeconds > 1)
+            {
+                FPS = fps;
+                fps = 0;
+                LastFPS = DateTime.Now;
+            }
             lock (Systems)
             {
                 lock (GlobalSystems)
@@ -81,8 +93,7 @@ namespace SimpleECS
                                 lock (TDic[t]) {
                                     for (int j = 0; j < TDic[t].Count; j++) {
                                         if (j < TDic[t].Count) {
-                                            var e = TDic[t][j];
-                                            s.Update(e.GetComponent(t));
+                                            s.Update(TDic[t][j]);
                                         }
                                     }
                                 }
@@ -91,22 +102,6 @@ namespace SimpleECS
                     }
                 }
             }
-        }
-
-        public SEntity[] GetEntities<T>() where T : ISComponent
-        {
-            return GetEntities(typeof(T));
-        }
-        public SEntity[] GetEntities(Type type)
-        {
-            lock (TDic)
-            {
-                if (TDic.ContainsKey(type))
-                {
-                    return TDic[type].ToArray();
-                }
-            }
-            return new SEntity[0];
         }
         public SEntity GetEntity(uint UID)
         {
@@ -133,15 +128,15 @@ namespace SimpleECS
                     {
                         if (!TDic.ContainsKey(c.GetType()))
                         {
-                            TDic.Add(c.GetType(), new List<SEntity>());
+                            TDic.Add(c.GetType(), new List<ISComponent>());
                         }
-                        TDic[c.GetType()].Add(Entity);
+                        TDic[c.GetType()].Add(c);
                     };
                     Entity.OnRemoveCom += (c) =>
                     {
                         if (TDic.ContainsKey(c.GetType()))
                         {
-                            TDic[c.GetType()].Remove(Entity);
+                            TDic[c.GetType()].Remove(c);
                             if (TDic[c.GetType()].Count == 0)
                             {
                                 TDic.Remove(c.GetType());
@@ -151,6 +146,7 @@ namespace SimpleECS
                     Entity.Init();
                     IDEntities.Add(Entity.UID, Entity);
                     Entity.OnAddToWorld?.Invoke(Entity);
+                    OnAddEntity?.Invoke(Entity);
                 }
             }
         }
@@ -175,7 +171,7 @@ namespace SimpleECS
                                 if (TDic.ContainsKey(c.GetType()))
                                 {
                                     lock (TDic[c.GetType()]) {
-                                        TDic[c.GetType()].Remove(Entity);
+                                        TDic[c.GetType()].Remove(c);
                                         if (TDic[c.GetType()].Count == 0)
                                         {
                                             TDic.Remove(c.GetType());
@@ -183,6 +179,7 @@ namespace SimpleECS
                                     }
                                 }
                             }
+                            OnRemoveEntity?.Invoke(Entity);
                         }
                     }
                 }
