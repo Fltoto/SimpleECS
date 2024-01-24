@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 /*
 # THIS FILE IS PART OF SimpleECS
 # 
@@ -24,10 +25,11 @@ namespace SimpleECS
         public Action<SEntity> OnAddEntity, OnRemoveEntity;
         public int FPS { get; private set; }
         private int fps;
+        public float Duration = 0.01f;
         private DateTime LastFPS;
         private DateTime LastFixed;
         private Thread main;
-
+        private DateTime LastTime;
         private Dictionary<Type, List<ISComponent>> TDic = new Dictionary<Type, List<ISComponent>>();
         private Dictionary<uint, SEntity> IDEntities = new Dictionary<uint, SEntity>();
         private List<ISSystem> Systems = new List<ISSystem>();
@@ -82,7 +84,10 @@ namespace SimpleECS
                 LastFixed = DateTime.Now;
                 FixedUpdateSystem();
             }
-            UpdateSystem();
+            if ((DateTime.Now-LastTime).TotalSeconds >= Duration) {
+                LastTime = DateTime.Now;
+                UpdateSystem();
+            }
         }
         private void UpdateSystem()
         {
