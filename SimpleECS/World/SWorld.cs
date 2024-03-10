@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 /*
 # THIS FILE IS PART OF SimpleECS
 # 
@@ -84,7 +83,8 @@ namespace SimpleECS
                 LastFixed = DateTime.Now;
                 FixedUpdateSystem();
             }
-            if ((DateTime.Now-LastTime).TotalSeconds >= Duration) {
+            if ((DateTime.Now - LastTime).TotalSeconds >= Duration)
+            {
                 LastTime = DateTime.Now;
                 UpdateSystem();
             }
